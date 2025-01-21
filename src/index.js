@@ -11,6 +11,11 @@ app.set('view engine', 'ejs');
 
 // 解析 JSON 数据
 app.use(express.json());
+const chromiumLaunchOptions = {
+  executablePath: "/usr/bin/chromium-browser",
+  headless: true,
+  args: ['--no-sandbox']//这句必须要加
+}
 
 // API 接口：生成 PDF
 app.post('/pdf/generate-pdf', async (req, res) => {
@@ -22,7 +27,7 @@ app.post('/pdf/generate-pdf', async (req, res) => {
     const html = await renderTemplate(data);
 
     // 启动无头浏览器
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch(chromiumLaunchOptions);
     const page = await browser.newPage();
 
     // 设置页面内容
@@ -68,10 +73,10 @@ app.post('/pdf/generatePdfByUrl', async (req, res) => {
     // 获取请求体中的数据
     const data = req.body;
 
-    if(!data.url) res.status(500).send('url is required');
+    if (!data.url) res.status(500).send('url is required');
 
     // 启动无头浏览器
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch(chromiumLaunchOptions);
     const page = await browser.newPage();
 
     await page.goto(data.url);
@@ -84,6 +89,7 @@ app.post('/pdf/generatePdfByUrl', async (req, res) => {
 
     // 设置响应头部，告知客户端这是一个 PDF 文件
     res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('data-type', 'file');
     res.setHeader('Content-Length', pdfBuffer.length);
 
     // 创建一个可读流并管道到响应对象

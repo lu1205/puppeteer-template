@@ -2,7 +2,7 @@
 
 
 ### 项目介绍
-此项目使用node-puppeteer实现pdf下载
+此项目使用node+puppeteer实现pdf下载
 
 ```
 // 通过链接下载页面pdf
